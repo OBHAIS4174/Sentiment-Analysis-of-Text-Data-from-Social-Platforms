@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sentiment Analysis Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #e3f2fd, #ffffff);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        header {
+            background-color: #1e3a8a;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header .title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        header svg {
+            background-color: #34d399;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            font-size: 1rem;
+            margin: 0 15px;
+            transition: color 0.3s ease-in-out;
+        }
+
+        nav a:hover {
+            color: #34d399;
+        }
+
+        nav a.active {
+            color: #34d399;
+            font-weight: bold;
+        }
+
+        .form-container {
+            background-color: #f9fafb;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .btn-custom {
+            background-color: #34d399;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #059669;
+            transform: scale(1.05);
+        }
+
+        footer {
+            background-color: #1e3a8a;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 50px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        footer small {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-width="2" class="w-8 h-8" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                Sentiment Analysis Portal
+            </div>
+            <nav>
+                <a href="/" class="hover:text-gray-900 active">Home</a>
+                <a href="/about" class="hover:text-gray-900">About</a>
+                <a href="/contact" class="hover:text-gray-900">Contact Us</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <section class="text-gray-600 body-font">
+        <div class="container">
+            <div class="text-center py-5">
+                <h1 class="text-3xl font-semibold text-gray-900">Analyze Sentiment with Ease</h1>
+                <p class="mt-4 text-gray-500">Understand your text's emotional tone instantly using advanced NLP.</p>
+            </div>
+
+            <!-- Form Section -->
+            <div class="form-container">
+                <form id="sentimentForm" method="POST">
+                    <label for="inputText" class="form-label">Enter your text for analysis:</label>
+                    <textarea id="inputText" name="inputText" class="form-control mb-4" rows="4"
+                        placeholder="Type your text here..."></textarea>
+                    <button type="submit" class="btn btn-custom w-100">Analyze Sentiment</button>
+                </form>
+                <div id="result" class="alert mt-4 d-none text-center"></div>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Sentiment Analysis Portal. All rights reserved.</p>
+        <small>Powered by AI and NLP.</small>
+    </footer>
+    {% include 'base.html' %}
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
+    <script>
+        // Form submission handler
+        document.getElementById('sentimentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const text = document.getElementById('inputText').value;
+
+            fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.className = 'alert mt-4 text-center';
+                    resultDiv.classList.remove('d-none');
+
+                    if (data.sentiment === 'Positive') {
+                        resultDiv.classList.add('alert-success');
+                        resultDiv.innerHTML = `<i class="fas fa-smile"></i> Sentiment: Positive`;
+                    } else if (data.sentiment === 'Negative') {
+                        resultDiv.classList.add('alert-danger');
+                        resultDiv.innerHTML = `<i class="fas fa-frown"></i> Sentiment: Negative`;
+                    } else {
+                        resultDiv.classList.add('alert-secondary');
+                        resultDiv.innerHTML = `<i class="fas fa-meh"></i> Sentiment: Neutral`;
+                    }
+                });
+        });
+    </script>
+</body>
+
+</html>

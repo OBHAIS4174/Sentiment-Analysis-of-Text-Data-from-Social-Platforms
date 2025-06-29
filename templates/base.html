@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <style>
+        /* Add some basic styles for the pop-up */
+        /* Add some basic styles for the pop-up */
+.popup {
+    display: none;
+    position: fixed;
+    top: 80%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    padding: 20px;  /* Reduced padding */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+}
+
+.chat-messages {
+    background-color: lightblue;
+    padding: 8px;  /* Reduced padding */
+    border-radius: 10px;
+    margin: 5px 0;
+    display: inline-flex;
+}
+
+.chat-link {
+    color: black;
+    border-top-left-radius: 15;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding: 5px 10px;
+    background-color: lightgray;
+    text-decoration: none;
+}
+
+/* Add some basic styles for the chat container */
+#chat-container {
+    max-width: 155;  /* Reduced width */
+    margin: auto;
+    border: 1px solid #ccc;
+    padding: 8px;  /* Reduced padding */
+    background-color: #344ed3;
+}
+
+/* Style for buttons */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.chatbox__support .chatbox__header .chatbox__heading--header {
+    font-size: 18px;  /* Reduced text size */
+}
+
+.chatbox__footer input {
+    font-size: 14px;  /* Smaller font size for input */
+}
+
+#chatbot-icon {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+
+
+
+
+.chatbox__messages {
+    font-size: 14px;  /* Reduced font size of messages */
+}
+
+.chatbot__content--starter {
+    font-size: 16px;  /* Smaller font for the starter message */
+    color: #344ed3;
+}
+
+    </style>
+</head>
+<body>
+
+<p id="greeting"></p>
+<div class="container">
+    <div class="chatbox">
+        <div class="chatbox__support">
+            <div class="chatbox__header">
+                <div class="chatbox__image--header">
+                    <img src="https://img.icons8.com/color/48/000000/circled-user-female-skin-type-5--v1.png" alt="image">
+                </div>
+                <div class="chatbox__content--header">
+                    <h4 class="chatbox__heading--header">Welcome to Our Chatbot ! 🎉</h4>
+                </div>
+            </div>
+            <div class="chatbox__messages">
+                <!-- Messages will go here -->
+                <div class="chat-messagess">
+
+                </div>
+                <h1 class="chatbot__content--starter">Good day! If you have any questions or need assistance, feel free to ask... 😊 Main menu:-</h1>
+            </div>
+
+            <div class="chatbox__footer">
+                <input type="text" placeholder="Write a message...">
+                <div class="button-group">
+                   </button>
+                    <button class="chatbox__send--footer send__button" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+        <div class="chatbox__button">
+            <button id="chatbot-icon" onclick="togglePopup()">
+                <img 
+                    src="{{ url_for('static', filename='images/9195256.png') }}" 
+                    alt="Chatbot Image" 
+                    style="width: 40px; height: 30px; object-fit: contain !important;"
+                >
+
+            </button>
+        </div>
+    </div>
+</div>
+<div id="response"></div>
+<!-- Add a pop-up div -->
+<div id="popup" class="popup">
+    <p>Welcome to our website! If you have any specific questions or need assistance, please click on the Live Chat icon! 😊 </p>
+    <button onclick="closePopup()" style="color: white; border-radius: 1px; padding: 5px 10px; background-color: #344ed3;"
+            onmouseover="this.style.backgroundColor='blue'" onmouseout="this.style.backgroundColor='blue'">Close!
+    </button>
+
+</div>
+
+<script>
+
+    function displayGreeting() {
+        var name = document.getElementById("name").value;
+        var greeting = "Hello, ! How can I assist you today?";
+        document.getElementById("greeting").innerHTML = greeting;
+    }
+
+    // Function to open/close the pop-up
+    function togglePopup() {
+        const popup = document.getElementById('popup');
+        if (popup.style.display === 'block') {
+            closePopup();
+        } else {
+            openPopup();
+            closePopupMessage();  // Close the pop-up message if it's open
+        }
+    }
+
+    // Function to open the pop-up
+    function openPopup() {
+        document.getElementById('popup').style.display = 'block';
+    }
+
+    // Function to close the pop-up
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+
+    // Function to close the pop-up message
+    function closePopupMessage() {
+        setTimeout(closePopup, 0);  // Close the pop-up immediately
+    }
+
+    function sendMessage() {
+    var message = document.querySelector('.chatbox__footer input').value;
+    if (!message.trim()) {
+        alert("Please enter a message!");
+        return;
+    }
+
+    // Clear the input field after sending the message
+    document.querySelector('.chatbox__footer input').value = "";
+
+    // Send the message to the server using fetch
+    fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the response from the server
+        const chatboxMessages = document.querySelector('.chatbox__messages');
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.className = 'bot-message';
+        botMessageDiv.textContent = "Bot: " + data.response;
+        chatboxMessages.appendChild(botMessageDiv);
+        chatboxMessages.scrollTop = chatboxMessages.scrollHeight; // Auto-scroll to the latest message
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Something went wrong. Please try again later.");
+    });
+}
+
+    // Function to show the pop-up message automatically
+    function showPopupMessage() {
+        openPopup();
+        // You can set a timeout to automatically close the pop-up after a certain duration
+        setTimeout(closePopup, 15000); // Close the pop-up after 15 seconds (adjust as needed)
+    }
+
+    // Call the function to show the pop-up automatically when the page loads
+    window.onload = showPopupMessage;
+
+    // Voice Recognition Functions
+    function startVoiceRecognition() {
+        fetch('/voice_recognition', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = "Chatbot Response: " + data.answer;
+                speak(data.voice_input);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function speak(text) {
+        var synth = window.speechSynthesis;
+        var utterance = new SpeechSynthesisUtterance(text);
+        synth.speak(utterance);
+    }
+</script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
