@@ -20,8 +20,8 @@ A machine learning-powered sentiment analysis application built with Flask that 
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/OBHAIS4174/Sentiment-Analysis-of-Text-Data-from-Social-Platforms>
-cd sentiment-analysis-project
+git clone https://github.com/OBHAIS4174/Sentiment-Analysis-of-Text-Data-from-Social-Platforms
+cd Sentiment-Analysis-of-Text-Data-from-Social-Platforms
 ```
 
 ### Step 2: Setting up the Virtual Environment
